@@ -17,8 +17,4 @@ public class PropertiesValueConfig {
     @Value("${jwt.token-validity-in-seconds}")
     private String jwtValiditySec;
 
-
-
-
-
 }

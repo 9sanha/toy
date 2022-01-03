@@ -1,29 +1,35 @@
-
 package com.scope.toy.controller;
 
-
 import com.scope.toy.domain.User;
-import com.scope.toy.dto.ResponseDto;
-import com.scope.toy.dto.UserRequestDto;
-import com.scope.toy.dto.UserResponseDto;
+import com.scope.toy.dto.*;
 import com.scope.toy.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+@RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/user")
 public class UserRestController {
 
-    @Autowired
-    private UserService userService;
-
-    @PostMapping("/signup")
+    private final UserService userService;
+    //회원가입
+    @PostMapping("/api/user/signup")
     ResponseDto signup(@RequestBody UserRequestDto userRequestDto) {
-        User user = new User(userRequestDto);
-        boolean userJoinSuccess = userService.join(user);
-        return new ResponseDto(new UserResponseDto(user), userJoinSuccess ? "Signup succeeded" : "Signup failed");
+        //중복검사
+        userService.duplicateUser(userRequestDto);
+        //저장
+        User user = userService.saveUser(userRequestDto);
+        return new ResponseDto(user, "회원가입 완료");
     }
+
+    //로그인
+    @PostMapping("/api/user/signin")
+    ResponseDto signin(@RequestBody UserSigninDto userSigninDto){
+        userService.userSignin(userSigninDto);
+        JwtTokenDto token = new JwtTokenDto(userService.getJwtToken(userSigninDto.getUserId()));
+        return new ResponseDto(token,"로그인 성공");
+    }
+
+//    @GetMapping("/api/user/self")
+//    ResponseDto getUser(@)
 }

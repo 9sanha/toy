@@ -17,7 +17,7 @@ public class JwtTestController {
 
     @GetMapping("/token")
     public JwtTokenDto createToken() {
-        String tokenValue = jwtTokenProvider.createJwtToken(1L);
+        String tokenValue = jwtTokenProvider.createJwtToken("user");
         JwtTokenDto tokenDto = new JwtTokenDto(tokenValue);
         return tokenDto;
     }

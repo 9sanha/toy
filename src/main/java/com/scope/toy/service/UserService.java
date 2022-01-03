@@ -2,26 +2,52 @@ package com.scope.toy.service;
 
 
 import com.scope.toy.domain.User;
+import com.scope.toy.dto.UserRequestDto;
+import com.scope.toy.dto.UserSigninDto;
 import com.scope.toy.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.scope.toy.utils.jwt.JwtTokenProvider;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-
+@RequiredArgsConstructor
 @Service
 public class UserService {
-    @Autowired
-    private UserRepository userRepository;
 
-//    @Autowired
-//    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public boolean join(User user) {
-        if(duplicateUserExist(user)) return false;
-        userRepository.save(user);
-        return true;
+    public void duplicateUser(UserRequestDto userRequestDto) {
+        duplicateId(userRequestDto.getUserId());
+        duplicateNickname(userRequestDto.getNickname());
+        duplicateNumber(userRequestDto.getPhoneNumber());
+    }
+    public User saveUser(UserRequestDto userRequestDto){
+        User user = new User(userRequestDto);
+        return userRepository.save(user);
+    }
+    private void duplicateId(String id){
+        if (userRepository.findByUserId(id).isPresent()){
+            throw new IllegalArgumentException("아이디 중복");
+        }
+    }
+    private void duplicateNickname(String nickname){
+        if(userRepository.findByNickname(nickname).isPresent())
+                throw new IllegalArgumentException("닉네임 중복");
+    }
+    private void duplicateNumber(String number){
+        if (userRepository.findByPhoneNumber(number).isPresent())
+                throw new IllegalArgumentException("전화번호 중복");
     }
 
-    private boolean duplicateUserExist(User user) {
-        return userRepository.findByUserId(user.getUserId()).isPresent();
+    public void userSignin(UserSigninDto userSigninDto) {
+        userRepository.findByUserId(userSigninDto.getUserId()).orElseThrow(
+                ()-> new IllegalArgumentException("존재하지 않는 아이디")
+        );
+
+    }
+
+    public String getJwtToken(String userId) {
+        return jwtTokenProvider.createJwtToken(userId);
     }
 }
+

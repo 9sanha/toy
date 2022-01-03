@@ -1,9 +1,10 @@
 package com.scope.toy.dto;
 import com.sun.istack.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-
+@Builder
 @Getter
 @RequiredArgsConstructor
 public class UserRequestDto {
