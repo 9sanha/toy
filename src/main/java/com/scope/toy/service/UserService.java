@@ -21,19 +21,23 @@ public class UserService {
         duplicateNickname(userRequestDto.getNickname());
         duplicateNumber(userRequestDto.getPhoneNumber());
     }
+
     public User saveUser(UserRequestDto userRequestDto){
         User user = new User(userRequestDto);
         return userRepository.save(user);
     }
+
     private void duplicateId(String id){
         if (userRepository.findByUserId(id).isPresent()){
             throw new IllegalArgumentException("아이디 중복");
         }
     }
+
     private void duplicateNickname(String nickname){
         if(userRepository.findByNickname(nickname).isPresent())
                 throw new IllegalArgumentException("닉네임 중복");
     }
+
     private void duplicateNumber(String number){
         if (userRepository.findByPhoneNumber(number).isPresent())
                 throw new IllegalArgumentException("전화번호 중복");
@@ -43,7 +47,6 @@ public class UserService {
         userRepository.findByUserId(userSigninDto.getUserId()).orElseThrow(
                 ()-> new IllegalArgumentException("존재하지 않는 아이디")
         );
-
     }
 
     public String getJwtToken(String userId) {
